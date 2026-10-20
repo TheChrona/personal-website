@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import BlogCard from '../../../components/BlogCard.astro';
+import Layout from '../../../layouts/Layout.astro';
+import { slugifyTag } from '../../../utils/blog';
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog');
+	const tags = [...new Set(posts.flatMap((post) => post.data.tags))];
+
+	return tags.map((tag) => ({
+		params: { tag: slugifyTag(tag) },
+		props: { tagLabel: tag },
+	}));
+}
+
+const { tag } = Astro.params;
+const { tagLabel } = Astro.props;
+const posts = (await getCollection('blog'))
+	.filter((post) => post.data.tags.includes(tagLabel))
+	.sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
+---
+
+<Layout title={`Artigos: ${tagLabel}`} description={`Artigos sobre ${tagLabel} no meu espaço criativo.`}>
+	<main class="site-shell page-shell">
+		<div class="page-kicker"><a href="/blog/">BLOG</a><span aria-hidden="true"> / </span> TAG</div>
+		<header class="page-heading tag-page-heading">
+			<div>
+				<h1>{tagLabel}<span class="heading-period">.</span></h1>
+				<p>{posts.length} {posts.length === 1 ? 'artigo encontrado' : 'artigos encontrados'} com esta tag.</p>
+			</div>
+			<a class="back-link" href="/blog/">← Todos os artigos</a>
+		</header>
+		<section class="post-grid" aria-label={`Artigos com a tag ${tagLabel}`}>
+			{posts.map((post) => <BlogCard post={post} />)}
+		</section>
+	</main>
+</Layout>

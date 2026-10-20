@@ -1,0 +1,44 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { slugifyTag } from '../../utils/blog';
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog');
+	return posts.map((post) => ({
+		params: { slug: post.id },
+		props: { post },
+	}));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const formattedDate = post.data.publishedAt.toLocaleDateString('pt-BR', {
+	day: '2-digit',
+	month: 'long',
+	year: 'numeric',
+	timeZone: 'UTC',
+});
+---
+
+<Layout title={post.data.title} description={post.data.description}>
+	<main class="site-shell page-shell article-shell">
+		<a class="back-link article-back" href="/blog/">← Voltar ao blog</a>
+		<article>
+			<header class="article-header">
+				<div class="tag-list">
+					{post.data.tags.map((tag) => (
+						<a class="tag" href={`/blog/tags/${slugifyTag(tag)}/`}>{tag}</a>
+					))}
+				</div>
+				<h1>{post.data.title}<span class="heading-period">.</span></h1>
+				<p class="article-description">{post.data.description}</p>
+				<time datetime={post.data.publishedAt.toISOString()}>{formattedDate}</time>
+			</header>
+			<div class="article-content">
+				<Content />
+			</div>
+		</article>
+		<div class="article-end"><span>✳</span> FIM DA NOTA <span>✳</span></div>
+	</main>
+</Layout>

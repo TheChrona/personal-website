@@ -1,0 +1,105 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = 'Meu espaço criativo',
+	description = 'Um canto independente na internet para ideias, projetos e histórias.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<script is:inline>
+			try {
+				const savedTheme = localStorage.getItem('site-theme');
+				document.documentElement.dataset.theme = savedTheme === 'dark' ? 'dark' : 'light';
+			} catch (error) {
+				console.error('Não foi possível carregar o tema salvo.', error);
+				document.documentElement.dataset.theme = 'light';
+			}
+		</script>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content={description} />
+		<meta name="theme-color" content="#ff6a00" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title} — Meu espaço criativo</title>
+	</head>
+	<body id="top">
+		<div class="top-strip">
+			<div class="top-strip-inner">
+				<span>UMA JANELA ABERTA PARA A INTERNET</span>
+				<span class="top-strip-note">ideias independentes desde 2026 <span aria-hidden="true">✳</span></span>
+			</div>
+		</div>
+		<header class="site-header">
+			<div class="header-inner">
+				<a class="brand" href="/" aria-label="Meu espaço criativo — início">
+					<span class="brand-mark" aria-hidden="true">M<span>✳</span></span>
+					<span class="brand-name">meu espaço<br /><strong>criativo</strong></span>
+				</a>
+				<nav class="main-nav" aria-label="Navegação principal">
+					<a href="/">Início</a>
+					<a href="/blog/">Blog <span class="nav-spark" aria-hidden="true">✳</span></a>
+				</nav>
+				<button
+					class="theme-toggle"
+					id="theme-toggle"
+					type="button"
+					role="switch"
+					aria-checked="false"
+					aria-label="Tema"
+				>
+					<span class="theme-toggle-icon" aria-hidden="true">☀</span>
+					<span id="theme-toggle-label">Tema claro</span>
+				</button>
+			</div>
+		</header>
+		<slot />
+		<footer class="site-footer">
+			<div class="footer-inner">
+				<a class="footer-brand" href="/">meu espaço criativo <span>✳</span></a>
+				<p>Feito com curiosidade e um pouco de código.</p>
+				<a href="#top">Voltar ao topo ↑</a>
+			</div>
+		</footer>
+		<script>
+			const toggle = document.querySelector<HTMLButtonElement>('#theme-toggle');
+			const label = document.querySelector<HTMLElement>('#theme-toggle-label');
+			const icon = toggle?.querySelector<HTMLElement>('.theme-toggle-icon');
+
+			if (!toggle || !label || !icon) {
+				throw new Error('O controle de tema não foi encontrado.');
+			}
+
+			const updateThemeControl = () => {
+				const isDark = document.documentElement.dataset.theme === 'dark';
+				toggle.setAttribute('aria-checked', String(isDark));
+				label.textContent = isDark ? 'Tema escuro' : 'Tema claro';
+				icon.textContent = isDark ? '☾' : '☀';
+			};
+
+			updateThemeControl();
+
+			toggle.addEventListener('click', () => {
+				const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+				document.documentElement.dataset.theme = theme;
+				updateThemeControl();
+
+				try {
+					localStorage.setItem('site-theme', theme);
+				} catch (error) {
+					console.error('Não foi possível salvar a preferência de tema.', error);
+				}
+			});
+		</script>
+	</body>
+</html>

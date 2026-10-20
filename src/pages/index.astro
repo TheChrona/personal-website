@@ -1,0 +1,81 @@
+---
+import { getCollection } from 'astro:content';
+import BlogCard from '../components/BlogCard.astro';
+import ProfileCard from '../components/ProfileCard.astro';
+import Layout from '../layouts/Layout.astro';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf(),
+);
+const recentPosts = posts.slice(0, 3);
+const profile = {
+	name: 'Alex Silva',
+	email: 'alex.silva@example.com',
+	avatar:
+		'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=240&h=240&q=80',
+	avatarAlt: 'Foto ilustrativa do perfil de Alex Silva',
+	socials: [
+		{ name: 'Instagram', url: 'https://instagram.com/' },
+		{ name: 'GitHub', url: 'https://github.com/' },
+		{ name: 'LinkedIn', url: 'https://linkedin.com/' },
+	],
+};
+---
+
+<Layout title="Meu espaço criativo" description="Um canto independente na internet para ideias, projetos e histórias.">
+	<main class="site-shell">
+		<section class="hero-panel" aria-labelledby="hero-title">
+			<div class="hero-copy">
+				<p class="eyebrow"><span class="status-dot"></span> FEITO NA INTERNET, COM CARINHO</p>
+				<h1 id="hero-title">Um pequeno canto.<br /><span>Um mundo de ideias.</span></h1>
+				<p class="hero-description">
+					Este é meu espaço independente para compartilhar projetos, descobertas e tudo aquilo que
+					merece uma pausa no scroll.
+				</p>
+				<a class="button button-dark" href="/blog/">Explorar o blog <span aria-hidden="true">↗</span></a>
+			</div>
+			<div class="hero-art" aria-hidden="true">
+				<div class="orbit orbit-one"></div>
+				<div class="orbit orbit-two"></div>
+				<div class="spark spark-one">✳</div>
+				<div class="spark spark-two">✦</div>
+				<div class="hero-sticker">
+					<span>INDEPENDENT</span>
+					<strong>WEB<br />ENERGY</strong>
+					<span>EST. MMXXVI</span>
+				</div>
+				<div class="hero-caption">um site feito à mão <span>✳</span></div>
+			</div>
+		</section>
+
+		<div class="home-content-grid">
+			<ProfileCard profile={profile} />
+			<section class="home-blog" aria-labelledby="blog-heading">
+				<div class="section-heading">
+					<div>
+						<p class="eyebrow">DO MEU CADERNO PARA A WEB</p>
+						<h2 id="blog-heading">Blog &amp; ideias</h2>
+					</div>
+					<a class="text-link" href="/blog/">Ver todos os artigos <span aria-hidden="true">→</span></a>
+				</div>
+
+				{recentPosts.length > 0 ? (
+					<div class="post-grid" aria-label="Artigos recentes">
+						{recentPosts.map((post) => <BlogCard post={post} />)}
+					</div>
+				) : (
+					<div class="empty-state">
+						<p>O caderno ainda está aberto na primeira página.</p>
+						<p>Em breve, novas ideias por aqui.</p>
+					</div>
+				)}
+			</section>
+		</div>
+
+		<section class="bottom-note">
+			<span class="note-icon" aria-hidden="true">✳</span>
+			<p>Um site pessoal, sem pressa e sempre em construção.</p>
+			<a href="/blog/">Leia as últimas notas <span aria-hidden="true">↗</span></a>
+		</section>
+	</main>
+</Layout>

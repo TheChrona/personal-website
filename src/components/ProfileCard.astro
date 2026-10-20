@@ -1,0 +1,43 @@
+---
+import { Image } from 'astro:assets';
+
+interface SocialLink {
+	name: string;
+	url: string;
+}
+
+interface Profile {
+	name: string;
+	email: string;
+	avatar: string;
+	avatarAlt: string;
+	socials: SocialLink[];
+}
+
+interface Props {
+	profile: Profile;
+}
+
+const { profile } = Astro.props;
+---
+
+<aside class="profile-card" aria-labelledby="profile-name">
+	<p class="profile-kicker"><span aria-hidden="true">✳</span> POR TRÁS DO SITE</p>
+	<Image
+		class="profile-avatar"
+		src={profile.avatar}
+		alt={profile.avatarAlt}
+		width={96}
+		height={96}
+		loading="lazy"
+	/>
+	<h2 id="profile-name">{profile.name}</h2>
+	<a class="profile-email" href={`mailto:${profile.email}`}>{profile.email}</a>
+	<nav class="profile-socials" aria-label={`Redes sociais de ${profile.name}`}>
+		{profile.socials.map((social) => (
+			<a href={social.url} aria-label={`${social.name} de ${profile.name}`}>
+				{social.name}<span aria-hidden="true">↗</span>
+			</a>
+		))}
+	</nav>
+</aside>

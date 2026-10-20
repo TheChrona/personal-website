@@ -1,0 +1,54 @@
+---
+import { getCollection } from 'astro:content';
+import BlogCard from '../../components/BlogCard.astro';
+import Layout from '../../layouts/Layout.astro';
+import { slugifyTag } from '../../utils/blog';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf(),
+);
+const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort((a, b) =>
+	a.localeCompare(b, 'pt-BR'),
+);
+---
+
+<Layout title="Blog" description="Artigos, anotações e ideias do meu espaço criativo.">
+	<main class="site-shell page-shell">
+		<div class="page-kicker"><span aria-hidden="true">✳</span> O CADERNO ESTÁ ABERTO</div>
+		<header class="page-heading">
+			<div>
+				<h1>Blog<span class="heading-period">.</span></h1>
+				<p>Ideias, processos e pequenas descobertas — compartilhados sem pressa.</p>
+			</div>
+			<div class="issue-stamp" aria-label={`${posts.length} ${posts.length === 1 ? 'artigo publicado' : 'artigos publicados'}`}>
+				<strong>{String(posts.length).padStart(2, '0')}</strong>
+				<span>ARTIGOS<br />PUBLICADOS</span>
+			</div>
+		</header>
+
+		{tags.length > 0 && (
+			<section class="tag-filter" aria-labelledby="tag-filter-title">
+				<h2 id="tag-filter-title">EXPLORE POR ASSUNTO</h2>
+				<div class="tag-list">
+					{tags.map((tag) => (
+						<a class="tag tag-large" href={`/blog/tags/${slugifyTag(tag)}/`}>{tag} <span aria-hidden="true">↗</span></a>
+					))}
+				</div>
+			</section>
+		)}
+
+		<section class="blog-listing" aria-label="Todos os artigos">
+			<div class="listing-label"><span>PUBLICAÇÕES</span><span>{posts.length} {posts.length === 1 ? 'ARTIGO' : 'ARTIGOS'}</span></div>
+			{posts.length > 0 ? (
+				<div class="post-grid">
+					{posts.map((post) => <BlogCard post={post} />)}
+				</div>
+			) : (
+				<div class="empty-state">
+					<p>Ainda não há artigos publicados.</p>
+					<p>Adicione um arquivo Markdown à pasta <code>src/content/blog/</code> para começar.</p>
+				</div>
+			)}
+		</section>
+	</main>
+</Layout>

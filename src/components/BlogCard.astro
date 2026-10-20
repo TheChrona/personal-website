@@ -1,0 +1,32 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { slugifyTag } from '../utils/blog';
+
+interface Props {
+	post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const formattedDate = post.data.publishedAt.toLocaleDateString('pt-BR', {
+	day: '2-digit',
+	month: 'short',
+	year: 'numeric',
+	timeZone: 'UTC',
+});
+---
+
+<article class="post-card">
+	<a class="post-card-main" href={`/blog/${post.id}/`}>
+		<div class="post-card-meta">
+			<time datetime={post.data.publishedAt.toISOString()}>{formattedDate}</time>
+			<span class="post-arrow" aria-hidden="true">↗</span>
+		</div>
+		<h3>{post.data.title}</h3>
+		<p>{post.data.description}</p>
+	</a>
+	<div class="tag-list" aria-label="Tags do artigo">
+		{post.data.tags.map((tag) => (
+			<a class="tag" href={`/blog/tags/${slugifyTag(tag)}/`}>{tag}</a>
+		))}
+	</div>
+</article>
